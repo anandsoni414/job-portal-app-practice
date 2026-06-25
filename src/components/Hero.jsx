@@ -7,7 +7,7 @@ const Hero = () => {
 
     const titleRef = useRef(null)
     const locationRef = useRef(null)
-
+    
     const onSearch= () =>{
         setSearchFilter({
                 title: titleRef.current.value,
