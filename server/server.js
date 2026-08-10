@@ -4,7 +4,7 @@ import cors from 'cors'
 import 'dotenv/config'
 import connectDB from './config/db.js'
 import { clerkWebhooks } from './controllers/webhooks.js'
-
+import companyRoutes from './routes/companyRoutes.js'
 
 //Initialise Express
 const app = express()
@@ -19,6 +19,7 @@ app.use(express.json())
 //Routes
 app.get('/',(req,res)=> res.send("API Working"))
 app.post('/webhooks',clerkWebhooks)
+app.use('/api/comapany',companyRoutes)
 
 // Port
 const PORT = process.env.PORT || 5000

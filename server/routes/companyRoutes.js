@@ -4,7 +4,7 @@ import { ChangeJobApplicationsStatus, changeVisiblity, getCompanyData, getCompan
 const router = express.Router()
 
 // Register a company
-router.post('/register', registerCompany)
+router.post('/register',upload.single('image'), registerCompany)
 
 // Company login
 router.post('/login',loginCompany)
@@ -26,3 +26,5 @@ router.post('/change-status',ChangeJobApplicationsStatus)
 
 // Change applicationn visiblity
 router.post('/change-visiblity',changeVisiblity)
+
+export default router
