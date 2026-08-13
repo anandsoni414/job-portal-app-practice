@@ -5,12 +5,14 @@ import 'dotenv/config'
 import connectDB from './config/db.js'
 import { clerkWebhooks } from './controllers/webhooks.js'
 import companyRoutes from './routes/companyRoutes.js'
+import connectCloudinary from './config/cloudinary.js'
 
 //Initialise Express
 const app = express()
 
 // Connect to database
 await connectDB()
+await connectCloudinary()
 
 // Middlewares
 app.use(cors())
