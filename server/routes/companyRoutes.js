@@ -1,5 +1,6 @@
 import express from 'express'
-import { ChangeJobApplicationsStatus, changeVisiblity, getCompanyData, getCompanyPostedJobs, loginCompany, postJob, registerCompany } from '../controllers/companyController'
+import { ChangeJobApplicationsStatus, changeVisiblity, getCompanyData, getCompanyJobApplicants, getCompanyPostedJobs, loginCompany, postJob, registerCompany } from '../controllers/companyController.js'
+import upload from '../config/multer.js'
 
 const router = express.Router()
 
@@ -12,7 +13,7 @@ router.post('/login',loginCompany)
 // Get company data
 router.get('/company',getCompanyData)
 
-// Get company data
+// Post a new job
 router.get('/post-job',postJob)
 
 // Get Applicants Data of Company
