@@ -1,3 +1,4 @@
+import dns from "dns";
 import './config/instrument.js'
 import express from 'express'
 import cors from 'cors'
@@ -9,6 +10,10 @@ import connectCloudinary from './config/cloudinary.js'
 import jobRoutes from './routes/jobRoutes.js'
 import userRoutes from './routes/userRoutes.js'
 import {clerkMiddleware} from '@clerk/express'
+
+import { v2 as cloudinary } from "cloudinary";
+
+dns.setServers(["8.8.8.8", "8.8.4.4"]);
 
 //Initialise Express
 const app = express()

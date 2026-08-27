@@ -1,6 +1,6 @@
-import Job from "../models/Job"
-import JobApplication from "../models/JobApplication"
-import User from "../models/User"
+import Job from "../models/Job.js"
+import JobApplication from "../models/JobApplication.js"
+import User from "../models/User.js"
 import { v2 as cloudinary} from 'cloudinary'
 
 

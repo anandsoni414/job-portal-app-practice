@@ -60,7 +60,11 @@ export const loginCompany = async (req,res) => {
         
         const company = await Company.findOne({email})
 
-        if(bcrypt.compare(password, company.password)) {
+        if (!company) {
+            return res.json({ success: false, message: "Invalid email or password" })
+        }
+
+        if(await bcrypt.compare(password, company.password)) {
             res.json({
                 success: true,
                 company:{
@@ -84,6 +88,17 @@ export const loginCompany = async (req,res) => {
 
 //Get company data
 export const getCompanyData = async (req,res) => {
+
+    try {
+        const company = req.company
+
+        res.json({success:true, company})
+
+    } catch (error) {
+        res.json({
+            success:false,message:error.message
+        })
+    }
 
 }
 
@@ -119,16 +134,7 @@ export const postJob = async (req,res) => {
 // Get company job applicants
 export const getCompanyJobApplicants = async (req,res) => {
 
-    try {
-        const company = req.company
 
-        res.json({success:true, company})
-
-    } catch (error) {
-        res.json({
-            success:false,message:error.message
-        })
-    }
 }
 
 // Get company posted jobs 
@@ -170,6 +176,7 @@ export const changeVisiblity = async (req,res) => {
         await job.save()
 
         res.json({success:true, job})
+
     } catch (error) {
         res.json({success:false, message:error.message})
     }

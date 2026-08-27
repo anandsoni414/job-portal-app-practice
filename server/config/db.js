@@ -5,7 +5,7 @@ const connectDB = async () => {
 
     mongoose.connection.on('connected',()=>console.log('Database Connected'))
 
-    const uri = process.env.MONGODB_URI.trim() + "/JOB-PORTAL-APP-PRACTICE";
+    const uri = process.env.MONGODB_URI.trim();
 
 console.log("URI =", uri);
 

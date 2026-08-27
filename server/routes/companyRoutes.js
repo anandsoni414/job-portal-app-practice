@@ -15,7 +15,7 @@ router.post('/login',loginCompany)
 router.get('/company',protectCompany,getCompanyData)
 
 // Post a new job
-router.get('/post-job',protectCompany,postJob)
+router.post('/post-job',protectCompany,postJob)
 
 // Get Applicants Data of Company
 router.get('/applicants',protectCompany,getCompanyJobApplicants)
