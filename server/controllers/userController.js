@@ -2,20 +2,72 @@ import Job from "../models/Job.js"
 import JobApplication from "../models/JobApplication.js"
 import User from "../models/User.js"
 import { v2 as cloudinary} from 'cloudinary'
+import { clerkClient, getAuth } from "@clerk/express"
 
+const getAuthenticatedUserId = (req, res) => {
+    const { userId } = getAuth(req)
+
+    if (!userId) {
+        res.status(401).json({ success: false, message: 'Not authorised, Login Again' })
+        return null
+    }
+
+    return userId
+}
+
+const getPrimaryEmail = (clerkUser) => {
+    return clerkUser.emailAddresses?.find((email) => email.id === clerkUser.primaryEmailAddressId)?.emailAddress
+        || clerkUser.primaryEmailAddress?.emailAddress
+        || clerkUser.emailAddresses?.[0]?.emailAddress
+        || ''
+}
+
+const getFullName = (clerkUser, email) => {
+    return [clerkUser.firstName, clerkUser.lastName].filter(Boolean).join(' ').trim()
+        || clerkUser.username
+        || email
+        || 'User'
+}
+
+const createUserFromClerk = async (userId) => {
+    const clerkUser = await clerkClient.users.getUser(userId)
+    const email = getPrimaryEmail(clerkUser)
+
+    return await User.findByIdAndUpdate(
+        userId,
+        {
+            $setOnInsert: {
+                email,
+                name: getFullName(clerkUser, email),
+                image: clerkUser.imageUrl || '',
+                resume: ''
+            }
+        },
+        { upsert: true, new: true }
+    )
+}
+
+const getOrCreateUser = async (userId) => {
+    const user = await User.findById(userId)
+
+    if (user) {
+        return user
+    }
+
+    return await createUserFromClerk(userId)
+}
 
 // Get user data
 export const getUserData = async (req,res) => {
-
-    const userId = req.auth.userId
     
     try {
-        
-        const user = await User.findById(userId)
+        const userId = getAuthenticatedUserId(req, res)
 
-        if (!user) {
-            return res.json({success: false, message: 'User Not Found'})
+        if (!userId) {
+            return
         }
+
+        const user = await getOrCreateUser(userId)
 
         res.json({success:true, user})
 
@@ -29,9 +81,14 @@ export const applyForJob = async (req,res) => {
 
     const { jobId} = req.body
 
-    const userId = req.auth.userId
-
     try {
+        const userId = getAuthenticatedUserId(req, res)
+
+        if (!userId) {
+            return
+        }
+
+        await getOrCreateUser(userId)
         
         const isAlreadyApplied = await JobApplication.find({jobId,userId})
 
@@ -65,7 +122,11 @@ export const getUserJobApplications = async (req,res) => {
 
     try {
         
-        const userId = req.auth.userId
+        const userId = getAuthenticatedUserId(req, res)
+
+        if (!userId) {
+            return
+        }
 
         const applications = await JobApplication.find({userId})
         .populate('companyId','name email image')
@@ -88,11 +149,15 @@ export const getUserJobApplications = async (req,res) => {
 export const updateUserResume = async (req,res) => {
     try {
         
-        const userId = req.auth.userId
+        const userId = getAuthenticatedUserId(req, res)
 
-        const resumeFile = req.resumeFile
+        if (!userId) {
+            return
+        }
 
-        const userData = await User.findById(userId)
+        const resumeFile = req.file
+
+        const userData = await getOrCreateUser(userId)
 
         if (resumeFile) {
             const resumeUpload = await cloudinary.uploader.upload(resumeFile.path)

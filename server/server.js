@@ -24,12 +24,12 @@ await connectCloudinary()
 
 // Middlewares
 app.use(cors())
-app.use(express.json())
-app.use(clerkMiddleware())
 
 //Routes
 app.get('/',(req,res)=> res.send("API Working"))
-app.post('/webhooks',clerkWebhooks)
+app.post('/webhooks', express.raw({ type: 'application/json' }), clerkWebhooks)
+app.use(express.json())
+app.use(clerkMiddleware())
 app.use('/api/company',companyRoutes)
 app.use('/api/jobs',jobRoutes)
 app.use('/api/users',userRoutes)
